@@ -1,0 +1,79 @@
+分桶
+
+- 取样sampling更高效。没有分桶的话需要扫描整个数据集。
+- 2、提升某些查询操作效率，例如map side join
+
+
+set hive.enforce.bucketing=true;
+
+set mapreduce.job.reduces=4; 设置与桶相同的reduce个数（默认只有一个reduce）
+
+use myhive;
+set hive.enforce.bucketing=true;
+set mapreduce.job.reduces=4;
+
+-- 创建分桶表
+create table myhive.user_buckets_demo(id int, name string)
+clustered by(id)
+into 4 buckets
+row format delimited fields terminated by '\t';
+
+先加载数据到普通表 中  然后 在 把 数据 插入分桶表中
+
+load data local inpath ‘/kkb/sss.csv’overwrite into table score  partition (month='201806')
+
+insert overwrite table score5 partition(month='202017') select s_id,c_id d_score from score;
+
+export导出与import 导入 hive表数据（内部表操作）
+
+create table teacher2 like teacher;
+
+export table teacher to  '/kkb/teacher';
+
+import table teacher2 from '/kkb/teacher';
+
+
+将查询结果 导出  local 本地  没有local hdfs
+
+insert overwrite local directory  'kkk/eee/e'  row format delimited fields  terminated ',' select * from stu;
+
+insert overwrite directory '/kkb/hivedatas/stu' row format delimited fields terminated by  ','  select * from stu;
+
+
+动态分区
+
+
+create table t_order(
+    order_number string,
+    order_price  double,
+    order_time   string
+)row format delimited fields terminated by '\t';
+
+create table order_dynamic_partition(
+    order_number string,
+    order_price  double
+)partitioned BY(order_time string)
+row format delimited fields terminated by '\t';
+
+
+set hive.exec.dynamic.partition=true;
+
+set hive.exec.dynamic.partition.mode=nonstrict;
+
+insert into table order_dynamic_partition partition(order_time) select order_number, order_price, order_time from t_order;
+
+order by  一个reduceTask  全局排序
+
+select s_id, avg(s_score) avgscore from score group by s_id order by avgscore desc;
+
+
+局部排序  sort by
+
+   distribute by：  map端将查询的结果中hash值相同的结果
+set mapreduce.job.reduces=3;
+
+insert overwrite local directory '/kkb/install/hivedatas/sort' select * from score s sort by s.s_score;
+
+insert overwrite local directory '/kkb/install/hivedatas/distribute' select * from score distribute by s_id sort by s_score;
+
+sort by 字段 = distribute by 字段   ===》 cluster by

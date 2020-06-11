@@ -1,0 +1,76 @@
+1.参数的传递
+
+
+cd /kkb/instal/hivedatas
+
+vim hivevariable.hql
+
+use myhive;
+select * from student left join score on student.s_id = score.s_id where score.month = ${hiveconf:month} and score.s_score > ${hivevar:s_score} and score.c_id = ${c_id};
+
+
+
+hive --hiveconf month=201912 --hivevar s_score=80 --hivevar c_id=03  -f /kkb/install/hivedatas/hivevariable.hql
+
+
+
+2.函数的使用
+
+1．查看系统自带的函数
+hive> show functions;
+2．显示自带的函数的用法
+hive> desc function upper;
+3．详细显示自带的函数的用法
+hive> desc function extended upper;
+
+
+ select if(1=2,100,200) from tableName;
+
+
+
+ select parse_url
+ ('https://www.tableName.com/path1/p.php?k1=v1&k2=v2#Ref1', 'HOST')
+ from tableName;
+ www.tableName.com
+ hive> select parse_url
+ ('https://www.tableName.com/path1/p.php?k1=v1&k2=v2#Ref1', 'QUERY', 'k1')
+  from tableName;
+
+
+  select  get_json_object('{"store":{"fruit":\[{"weight":8,"type":"apple"},{"weight":9,"type":"pear"}], "bicycle":{"price":19.95,"color":"red"} },"email":"amy@only_for_json_udf_test.net","owner":"amy"}','$.owner') from tableName;
+
+
+  行转列
+  hive (hive_explode)> select t1.base, concat_ws('|', collect_set(t1.name)) name
+  from
+  (select name, concat(constellation, "," , blood_type) base from person_info) t1
+  group by t1.base;
+
+
+
+  hive (hive_explode)> select goods_id2, sale_info from explode_lateral_view
+  LATERAL VIEW explode(split(goods_id, ','))goods as goods_id2;
+
+
+
+topN
+
+  select * from (
+  SELECT
+  cookieid,
+  createtime,
+  pv,
+  RANK() OVER(PARTITION BY cookieid ORDER BY pv desc) AS rn1,
+  DENSE_RANK() OVER(PARTITION BY cookieid ORDER BY pv desc) AS rn2,
+  ROW_NUMBER() OVER(PARTITION BY cookieid ORDER BY pv DESC) AS rn3
+  FROM cookie_pv
+  ) temp where temp.rn1 <= 3;
+
+
+
+==============================作业====================
+
+自定义函数
+
+explod view
+

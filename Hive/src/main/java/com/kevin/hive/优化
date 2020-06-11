@@ -1,0 +1,42 @@
+1. 配置压缩 参数
+ A. Hadoop中启用压缩，可以配置如下参数（mapred-site.xml文件中）：
+ B. map 阶段
+ C. reduce阶段
+
+
+ 2.在实际的项目开发当中，hive表的数据存储格式一般选择：orc或parquet。压缩方式一般选择snappy。
+
+ 默认 textfile数据不做压缩，磁盘开销大，数据解析开销大
+
+ create table log_orc_snappy(
+ track_time string,
+ url string,
+ session_id string,
+ referer string,
+ ip string,
+ end_user_id string,
+ city_id string
+ )
+ ROW FORMAT DELIMITED FIELDS TERMINATED BY '\t'
+ STORED AS orc tblproperties ("orc.compress"="SNAPPY");
+
+
+
+ 数据调优太重要了 面试必背
+
+
+
+作业：
+
+
+ use myhive;create  table t1 (id String, name string)row format serde 'org.apache.hadoop.hive.contrib.serde2.MultiDelimitSerDe'WITH SERDEPROPERTIES ("field.delim"="##");
+
+==================================== 通过MultiDelimitSerDe 解决多字符分割场景=====================
+
+
+
+create  table t2(id int, name string)
+row format serde 'org.apache.hadoop.hive.serde2.RegexSerDe'
+WITH SERDEPROPERTIES ("input.regex" = "^(.*)\\#\\#(.*)$");
+
+==============通过RegexSerDe 解决多字符分割场景===================

@@ -1,0 +1,89 @@
+数据仓储
+
+- 数据库是面向事务的设计，数据仓库是面向主题设计的。
+- 数据库一般存储业务数据，数据仓库存储的一般是历史数据。
+- 数据库设计是尽量避免冗余，一般针对某一业务应用进行设计；比如一张简单的User表，记录用户名、密码等简单数据即可，符合业务应用，但是不符合分析；
+数据仓库在设计是有意引入冗余，依照分析需求，分析维度、分析指标进行设计。
+
+
+数据仓库架构可分为三层——
+
+源数据层:  接口数据的临时存储区域，为后一步的数据处理做准备  ODS  外部表
+数据仓库层: 数据应该是一致的、准确的、干净的数据，即对源系统数据进行了清洗（去除了杂质）后的数据 DW  内部表
+数据应用层: 前端应用直接读取的数据源；根据报表、专题分析需求而计算生成的数据
+
+Hive是基于Hadoop的一个数据仓库工具
+
+- ==可以将结构化的数据文件映射为一张数据库表==，并提供类SQL查询功能。
+将SQL转换为MapReduce的任务进行运算，底层由HDFS来提供数据的存储支持
+
+链接方式：
+ 0. hive
+
+ 1. nohup hive --service hiveserver2 &      beeline        !connect jdbc:hive2://node03:10000
+
+ 2. hive  -e  hql 语句   hive -f  hive.sql
+
+DDL operator
+
+1.create database if not exists db_hive;
+
+2.show databases;
+
+3.show databases like 'db_hive*'
+
+4.desc databases extended db_hive;
+
+5.use db_hive  drop db_hive
+
+CREATE [EXTERNAL] TABLE [IF NOT EXISTS] table_name
+[(col_name data_type [COMMENT col_comment], ...)]
+[COMMENT table_comment]
+[PARTITIONED BY (col_name data_type [COMMENT col_comment], ...)] 分区
+[CLUSTERED BY (col_name, col_name, ...) 分桶
+[SORTED BY (col_name [ASC|DESC], ...)] INTO num_buckets BUCKETS]
+[ROW FORMAT row_format]  row format delimited fields terminated by “分隔符”
+[STORED AS file_format]
+[LOCATION hdfs_path]
+
+
+create table if not exists myhive.stu3(id int, name string)
+row format delimited fields terminated by '\t'
+stored as textfile
+location '/user/stu3';
+
+
+create table if not exists myhive.stu3(id int,name string)
+row format delimited fields terminated by '\t'
+srored as textfile
+location '/user/stu3'   --location  不指定 就/user/hive/warehouse
+
+external  外部表
+
+insert 数据 会产生很多的小文件
+
+load 数据
+
+load data local inpath '/kkb/install/hivedatas/teacher.csv' into table myhive.teacher
+
+load data inpath '/kkb/hdfsload/hivedatas' overwrite into table myhive.teacher
+
+创建分区表
+
+create table score(s_id  string ,c_id string,s_score int ) partitioned by
+(month string) row format delimited fields terminated by '\t'
+
+partitioned by (year string, month string, day string)
+
+load data local inpath '/kkb/ddd/ca.csv' into table score partition (month='201806')
+
+
+1 zhangsan beijing,shanghai
+2 lisi shanghai,tianjin
+
+
+create table mybice (id string,name string ,locations array<string>) row format delimited fields terminates by '\t'
+
+collection items terminated by ','
+
+map  list struct
