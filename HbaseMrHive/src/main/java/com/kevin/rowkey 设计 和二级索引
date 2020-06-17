@@ -1,0 +1,8 @@
+协处理器 建立索引表
+
+当用户put操作时，会将原rowkey，转换为新的rowkey，再存一份索引。
+当用户get操作时，会将rowkey映射为实际的rowkey，再根据实际的rowkey获取实际的结果。
+当用户执行scanner操作时，会将scanner的结果映射为实际rowkey的结果，返回给用户。
+————————————————
+版权声明：本文为CSDN博主「那记忆微凉」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/BigData_Mining/java/article/details/82380834
