@@ -1,0 +1,130 @@
+
+概念
+
+job
+
+JobTool
+
+用来生成一个sqoop的任务，生成后，该任务并不执行，除非使用命令执行该任务。
+
+
+
+bin/sqoop job --create myjob2 -- import --connect jdbc:mysql://node03:3306/userdb --username root --password 123456 --table emp --delete-target-dir
+
+
+bin/sqoop job --exec myjob2
+
+
+
+1.导入数据库表数据到HDFS
+
+bin/sqoop import --connect jdbc:mysql://node03:3306/userdb --password 123456 --username root --table emp --m 1
+
+2.导入到HDFS指定目录
+
+bin/sqoop import --connect jdbc:mysql://node03:3306/userdb --username root --password 123456 --delete-target-dir --table emp --target-dir /sqoop/emp --m 1
+
+hdfs dfs -text /sqoop/emp/part-m-00000  ----------》查看导出的数据
+
+3.导入到hdfs指定目录并指定字段之间的分隔符
+
+bin/sqoop import --connect jdbc:mysql://node03:3306/userdb --username root --password 123456 --delete-target-dir --table emp --target-dir /sqoop/emp2 --m 1 --fields-terminated-by '\t'
+
+
+
+
+
+导入关系表到HIVE
+
+
+bin/sqoop import --connect jdbc:mysql://node03:3306/userdb --username root --password 123456 --table emp_conn --hive-import -m 1 --hive-database sqooptohive;
+
+将mysql表数据导入到hbase当中去
+
+bin/sqoop import \
+--connect jdbc:mysql://node03:3306/library \
+--username root \
+--password 123456 \
+--table book \
+--columns "id,name,price" \
+--column-family "info" \
+--hbase-create-table \
+--hbase-row-key "id" \
+--hbase-table "hbase_book" \
+--num-mappers 1 \
+--split-by id
+
+
+
+
+ 导入表数据子集   --where <condition>
+
+ bin/sqoop import \
+ --connect jdbc:mysql://node03:3306/userdb \
+ --username root --password 123456 --table emp_add \
+ --target-dir /sqoop/emp_add -m 1 --delete-target-dir \
+ --where "city = 'sec-bad'"
+
+
+sql语句查找导入hdfs ---query
+
+bin/sqoop import \
+--connect jdbc:mysql://node03:3306/userdb --username root --password 123456 \
+--delete-target-dir -m 1 \
+--query 'select phno from emp_conn where 1=1 and  $CONDITIONS' \
+--target-dir /sqoop/emp_conn
+
+
+-----增量导入
+
+--incremental <mode>
+--check-column <column name>
+--last value <last check column value>
+
+------导入emp表当中id大于1202的所有数据
+
+bin/sqoop import \
+--connect jdbc:mysql://node03:3306/userdb \
+--username root \
+--password 123456 \
+--table emp \
+--incremental append \
+--check-column id \
+--last-value 1202 \
+-m 1 \
+--target-dir /sqoop/increment
+
+
+第二种增量导入通过--where条件来实现--------------------------------------------------------》常用
+
+
+bin/sqoop import \
+--connect jdbc:mysql://node03:3306/userdb \
+--username root \
+--password 123456 \
+--table emp \
+--incremental append \
+--where "create_time > '2018-06-17 00:00:00' and is_delete='1' and create_time < '2018-06-17 23:59:59'" \
+--target-dir /sqoop/incement2 \
+--check-column id \
+--m 1
+
+
+. 将数据从HDFS把文件导出到RDBMS数据库
+
+bin/sqoop export \
+--connect jdbc:mysql://node03:3306/userdb \
+--username root --password 123456 \
+--table emp_out \
+--export-dir /sqoop/emp \
+--input-fields-terminated-by ","
+
+注意：sqoop不支持我们直接将HBase当中的数据导出，所以我们可以通过以下的转换进行导出
+
+Hbase→hive外部表→hive内部表→通过sqoop→mysql
+
+
+
+
+
+

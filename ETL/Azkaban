@@ -1,0 +1,54 @@
+Azkaban是由Linkedin开源的一个批量工作流任务调度器。用于在一个工作流内以一个特定的顺序运行一组工作和流程。
+
+Azkaban由三部分构成
+
+- 1、Azkaban Web Server
+  提供了Web UI，是azkaban的主要管理者，包括 project 的管理，认证，调度，对工作流执行过程的监控等。
+- 2、Azkaban Executor Server
+  负责具体的工作流和任务的调度提交
+- 3、Mysql
+  用于保存项目、日志或者执行计划之类的信息
+
+
+1. solo server mode(单机模式）
+
+- web server 和 executor server运行在一个进程里
+- 最简单的模式，数据库内置的H2数据库，管理服务器和执行服务器都在一个进程中运行，任务量不大项目可以采用此模式。
+
+
+2. two server mode
+
+- web server 和 executor server运行在不同的进程
+- 数据库为mysql，管理服务器和执行服务器在不同进程，这种模式下，管理服务器和执行服务器互不影响。
+
+
+3. multiple executor mode
+
+- web server 和 executor server运行在不同的进程，executor server有多个
+- 该模式下，执行服务器和管理服务器在不同主机上，且执行服务器可以有多个。
+
+
+eg：
+
+- Mr任务依然可以使用command的job类型来执行
+- 创建job描述文件，及mr程序jar包（示例中直接使用hadoop自带的example jar）
+
+    type=command
+    command=/kkb/install/hadoop-2.6.0-cdh5.14.2/bin/hadoop jar /kkb/install/hadoop-2.6.0-cdh5.14.2/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.6.0-cdh5.14.2.jar pi 3 5
+
+
+- 将所有job资源文件打到一个zip包中
+
+
+
+
+
+- 在azkaban的web管理界面创建工程并上传zip包
+- 启动job
+
+
+
+#parameter.job
+type=command
+parameter=${param}
+command= echo ${parameter}
