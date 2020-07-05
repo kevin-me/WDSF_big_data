@@ -1,0 +1,59 @@
+
+node01节点上执行以下命令
+
+```
+第一台机器执行以下命令
+
+cd /kkb/install/hadoop-2.6.0-cdh5.14.2/
+sbin/start-dfs.sh
+sbin/start-yarn.sh
+
+
+停止集群：
+
+sbin/stop-dfs.sh
+
+sbin/stop-yarn.sh
+
+```
+
+ 
+
+#### 第八步：浏览器查看启动页面
+
+hdfs集群访问地址
+
+http://192.168.52.100:50070/dfshealth.html#tab-overview  
+
+yarn集群访问地址
+
+http://192.168.52.100:8088/cluster
+
+jobhistory访问地址：
+
+http://192.168.52.100:19888/jobhistory
+
+
+zkServer.sh start
+
+
+
+start-hbase.sh
+
+
+http://node01:60010
+
+
+ hive --service hiveserver2
+
+
+nohup hive --service hiveserver2 &
+
+beeline
+
+
+ !connect jdbc:hive2://node03:10000
+
+
+
+
