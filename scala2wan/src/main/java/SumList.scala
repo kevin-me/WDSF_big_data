@@ -1,5 +1,3 @@
-import scala.collection.mutable.ListBuffer
-
 object SumList {
 
   def main(args: Array[String]): Unit = {
