@@ -29,7 +29,6 @@ object KafkaDirect10_hbase_offset {
 
     val consistent: LocationStrategy = LocationStrategies.PreferConsistent
 
-
     /**
       * Subscribe 表示订阅某一个指定的topic
       * SubscribePattern  通过正则来进行匹配满足所有正则的topic的数据

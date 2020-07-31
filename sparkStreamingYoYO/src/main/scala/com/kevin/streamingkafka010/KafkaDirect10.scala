@@ -32,7 +32,6 @@ object KafkaDirect10 {
       * SubscribePattern  通过正则来进行匹配满足所有正则的topic的数据
       * assign  表示订阅某一个topic当中某些分区的数据
       * 订阅test这个topic里面的数据
-      *
       */
 
     /**
